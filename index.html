@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PMT Inventory - Barcode Scanner</title>
+  <script src="https://unpkg.com/html5-qrcode"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 25px auto;
+      padding: 16px;
+      color: #222;
+      background: #f5f7fa;
+    }
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px #0001;
+    }
+    h2 { color: #174ea6; }
+    button, input {
+      box-sizing: border-box;
+      width: 100%;
+      padding: 13px;
+      margin-top: 10px;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+    button {
+      border: 0;
+      background: #1769d2;
+      color: white;
+      cursor: pointer;
+    }
+    button:disabled { opacity: .5; }
+    input { border: 1px solid #bbb; }
+    #reader { width: 100%; margin-top: 15px; }
+    #status { margin-top: 15px; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>PMT Inventory</h2>
+    <p>Pemindai Barcode Barang</p>
+
+    <button id="startButton" onclick="startScanner()">
+      Buka Kamera
+    </button>
+
+    <div id="reader"></div>
+
+    <p id="status">Tekan tombol untuk mulai memindai.</p>
+
+    <hr>
+
+    <label for="manualBarcode">Atau masukkan barcode secara manual:</label>
+    <input id="manualBarcode" type="text"
+      placeholder="Masukkan nomor barcode">
+
+    <button onclick="sendBarcode(
+      document.getElementById('manualBarcode').value
+    )">
+      Kirim Barcode
+    </button>
+  </div>
+
+  <script>
+    let scanner = null;
+    let processing = false;
+
+    async function startScanner() {
+      const status = document.getElementById("status");
+      const button = document.getElementById("startButton");
+
+      if (!window.isSecureContext) {
+        status.textContent =
+          "Kamera membutuhkan koneksi HTTPS.";
+        return;
+      }
+
+      button.disabled = true;
+      status.textContent = "Meminta akses kamera...";
+
+      try {
+        scanner = new Html5Qrcode("reader");
+
+        await scanner.start(
+          { facingMode: "environment" },
+          {
+            fps: 10,
+            qrbox: { width: 250, height: 150 }
+          },
+          async (decodedText) => {
+            if (processing) return;
+            processing = true;
+
+            status.textContent =
+              "Barcode terbaca: " + decodedText;
+
+            await scanner.stop();
+            sendBarcode(decodedText);
+          }
+        );
+
+        status.textContent =
+          "Kamera aktif. Arahkan barcode ke kamera.";
+
+      } catch (error) {
+        status.textContent =
+          "Kamera tidak dapat dibuka: " + error;
+        button.disabled = false;
+      }
+    }
+
+    function sendBarcode(value) {
+      const barcode = String(value || "").trim();
+
+      if (!barcode) {
+        document.getElementById("status").textContent =
+          "Masukkan atau pindai barcode terlebih dahulu.";
+        return;
+      }
+
+      if (window.opener && !window.opener.closed) {
+        window.opener.postMessage({
+          type: "PMT_BARCODE",
+          barcode: barcode
+        }, "*");
+
+        document.getElementById("status").textContent =
+          "Barcode berhasil dikirim ke halaman PMT Inventory.";
+      } else {
+        document.getElementById("status").textContent =
+          "Barcode terbaca: " + barcode +
+          ". Buka scanner melalui tombol di sistem PMT Inventory.";
+      }
+    }
+  </script>
+</body>
+</html>
