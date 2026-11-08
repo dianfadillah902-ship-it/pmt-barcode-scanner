@@ -115,29 +115,33 @@
       }
     }
 
-    function sendBarcode(value) {
-      const barcode = String(value || "").trim();
+function sendBarcode(value) {
+  const barcode = String(value || "").trim();
 
-      if (!barcode) {
-        document.getElementById("status").textContent =
-          "Masukkan atau pindai barcode terlebih dahulu.";
-        return;
-      }
+  if (!barcode) {
+    document.getElementById("status").textContent =
+      "Masukkan atau pindai barcode terlebih dahulu.";
+    return;
+  }
 
-      if (window.opener && !window.opener.closed) {
-        window.opener.postMessage({
-          type: "PMT_BARCODE",
-          barcode: barcode
-        }, "*");
+  if (window.opener && !window.opener.closed) {
+    window.opener.postMessage({
+      type: "PMT_BARCODE",
+      barcode: barcode
+     }, "*");
 
-        document.getElementById("status").textContent =
-          "Barcode berhasil dikirim ke halaman PMT Inventory.";
-      } else {
-        document.getElementById("status").textContent =
-          "Barcode terbaca: " + barcode +
-          ". Buka scanner melalui tombol di sistem PMT Inventory.";
-      }
-    }
+    document.getElementById("status").textContent =
+      "Barcode berhasil dikirim ke PMT Inventory.";
+
+    setTimeout(() => {
+      window.close();
+    }, 700);
+
+  } else {
+    document.getElementById("status").textContent =
+      "Buka scanner melalui tombol di PMT Inventory.";
+  }
+}   
   </script>
 </body>
 </html>
