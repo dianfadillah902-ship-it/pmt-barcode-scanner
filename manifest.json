@@ -1,0 +1,23 @@
+{
+  "name": "PMT Inventory",
+  "short_name": "PMT Inventory",
+  "description": "Aplikasi manajemen stok dan pemindaian barcode PMT Inventory",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f1f5f9",
+  "theme_color": "#1769aa",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "./pmt-inventory-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "./pmt-inventory-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
