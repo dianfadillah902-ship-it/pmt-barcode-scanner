@@ -5,6 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>PMT Inventory - Barcode Scanner</title>
   <script src="https://unpkg.com/html5-qrcode"></script>
+  <link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#1769aa">
+
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./service-worker.js')
+        .catch(error => console.error('Service Worker:', error));
+    });
+  }
+</script>
   <style>
     body {
       font-family: Arial, sans-serif;
